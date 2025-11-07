@@ -1,0 +1,6 @@
+*.pyc
+*.pml
+extracted_pdbs/*
+tmp/*
+*.tpr
+*.xtc
