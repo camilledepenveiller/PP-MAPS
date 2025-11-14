@@ -4,3 +4,8 @@ extracted_pdbs/*
 tmp/*
 *.tpr
 *.xtc
+*.sdf
+*.pdb
+*.mol2
+*.png
+*.json

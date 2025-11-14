@@ -10,7 +10,13 @@ conda env create -f environment.yml
 conda activate pharmacomaps
 ```
 
-**Adapt path to LigandScout:** set the variable Pharmacophore_generator_path in `config.ini` file.
+
+## Choice of pharmacophore generator
+
+Pharmacomaps tool is able to use either LigandScout (under license) or CDPKit (open source) in the worflow. You can choose your pharmacophore generator by specifying it when running Pharmacomaps tool. Before, you have to install LigandScout or CDPKit.
+
+- For LigandScout, you have to adapt path to the pharmacophore generator: set the variable Pharmacophore_generator_path in `config.ini` file.
+- For CDPKit, be careful to install also Python bindings (see https://cdpkit.org/installation.html).
 
 
 ## Usage
@@ -26,6 +32,13 @@ options:
   -h, --help                        show this help message and exit
   -xtc XTC                          XTC trajectory file with centered system
   -tpr TPR                          TPR file used for MD
+  -ligandscout                      add this argument to use LigandScout as pharmacophore generator
+  -cdpkit                           add this argument to use CDPKit as pharmacophore generator
   -n N                              number of processes to perform the analysis, default to 1
   -o OUTPUT, --output OUTPUT        PNG output file with heatmap of pharmacophore features of the whole MD, default to pharmacomap.png
 ```
+
+
+## Formatting
+
+`isort .; black -l 79 .`

@@ -3,12 +3,13 @@ import configparser
 import json
 import multiprocessing as mp
 import os
+import sys
 from glob import glob
 
 from biopandas.pdb import PandasPdb
 
+from pharmacomaps_scripts import cdpkit, ligandscout
 from pharmacomaps_scripts.gmx import traj_to_pdbs
-from pharmacomaps_scripts.ligandscout import pdb_to_pml
 from pharmacomaps_scripts.map_interactions import generate_heatmap
 from pharmacomaps_scripts.pdb_modif import modify_pdb
 from pharmacomaps_scripts.pharmaco_analyses import (
@@ -20,15 +21,27 @@ from pharmacomaps_scripts.pml import xml_to_dict
 PML_TMP_DIRECTORY = "tmp"
 
 
-def loop_core(pdb_path: str, path_to_ipharmgen: str) -> dict[str, dict]:
+def loop_core(
+    pdb_path: str,
+    path_to_pharmacogenerator: str,
+    use_ligandscout: bool,
+    use_cdpkit: bool
+) -> dict[str, dict]:
     ppdb = PandasPdb().read_pdb(pdb_path)
     ppdb_modified = modify_pdb(ppdb)
     ppdb_modified.to_pdb(pdb_path)
 
-    pml_name = "output_" + str(mp.current_process().name) + ".pml"
+    pml_name = "output_" + mp.current_process().name + ".pml"
     pml_path = os.path.join(PML_TMP_DIRECTORY, pml_name)
 
-    pdb_to_pml(pdb_path, path_to_ipharmgen, pml_path)
+
+    if use_ligandscout:
+        ligandscout.pdb_to_pml(pdb_path, path_to_pharmacogenerator, pml_path)
+
+    if use_cdpkit:
+        ligand_path, receptor_path = cdpkit.split_pdb_receptor_ligand(pdb_path)
+        sdf_path = cdpkit.convert_pdb_to_sdf(ligand_path)
+        cdpkit.pdb_to_pml(receptor_path, sdf_path, pml_path)
 
     dict_interactions = xml_to_dict(pml_path)
     return dict_interactions
@@ -38,14 +51,19 @@ def from_traj_to_pharmaco(
     path_traj: str,
     path_tpr: str,
     output_dir_pdbs: str,
-    path_to_ipharmgen: str,
+    path_to_pharmacogenerator: str,
+    use_ligandscout: bool,
+    use_cdpkit: bool,
     number_processes: int,
 ) -> list[dict]:
 
     traj_to_pdbs(path_traj, path_tpr, output_dir_pdbs)
 
     list_pdbs = glob(output_dir_pdbs + "/*")
-    list_args = [(pdb, path_to_ipharmgen) for pdb in list_pdbs]
+    list_args = [
+        (pdb, path_to_pharmacogenerator, use_ligandscout, use_cdpkit)
+        for pdb in list_pdbs
+    ]
 
     if os.path.isdir(PML_TMP_DIRECTORY):
         list_files = glob(os.path.join(PML_TMP_DIRECTORY, "*"))
@@ -73,6 +91,16 @@ if __name__ == "__main__":
         "-tpr", type=str, help="TPR file used for MD.", required=True
     )
     parser.add_argument(
+        "-ligandscout",
+        action="store_true",
+        help="Add this argument to use LigandScout as pharmacophore generator.",
+    )
+    parser.add_argument(
+        "-cdpkit",
+        action="store_true",
+        help="Add this argument to use CDPKit as pharmacophore generator.",
+    )
+    parser.add_argument(
         "-n",
         type=int,
         default=1,
@@ -89,20 +117,34 @@ if __name__ == "__main__":
 
     config = configparser.ConfigParser()
     config.read("config.ini")
-    path_to_ipharmgen = config["PHARMACO_CONFIG"][
+    path_to_pharmacogenerator = config["PHARMACO_CONFIG"][
         "Pharmacophore_generator_path"
     ]
 
     path_traj = args.xtc
     path_tpr = args.tpr
+    use_ligandscout = args.ligandscout
+    use_cdpkit = args.cdpkit
     number_processes = args.n
+    if use_ligandscout and use_cdpkit:
+        print(
+            "Too many arguments for pharmacophore generator. Please select only one tool."
+        )
+        sys.exit()
+    if not use_ligandscout and not use_cdpkit:
+        print(
+            "No argument specified for pharmacophore generator. Please select one tool."
+        )
+        sys.exit()
     output_dir_pdbs = "extracted_pdbs"
     print("Starting PML files creation")
     list_dict_interactions = from_traj_to_pharmaco(
         path_traj,
         path_tpr,
         output_dir_pdbs,
-        path_to_ipharmgen,
+        path_to_pharmacogenerator,
+        use_ligandscout,
+        use_cdpkit,
         number_processes,
     )
     global_dict_interactions = get_global_dict(list_dict_interactions)
