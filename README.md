@@ -4,13 +4,13 @@
 Pharmacomaps tool allows to generate a heatmap of pharmacophore features between a receptor (protein) and a ligand (peptide) from a molecular dynamics trajectory.
 
 
-:warning: Use `environment.yml` to create the environment:
+Use `environment.yml` to create the environment:
 ```bash
 conda env create -f environment.yml
 conda activate pharmacomaps
 ```
 
-:warning: Adapt path to the pharmacophore generator (LigandScout or CDPKit): set the variable Pharmacophore_generator_path in `config.ini` file.
+**Adapt path to LigandScout:** set the variable Pharmacophore_generator_path in `config.ini` file.
 
 
 ## Usage
