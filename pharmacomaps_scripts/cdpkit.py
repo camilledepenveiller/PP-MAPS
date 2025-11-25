@@ -154,7 +154,7 @@ def pdb_to_pml(receptor_file: str, ligand_file: str, output_pml: str) -> None:
                 )  # make ligand ready for pharm. generation
 
                 ph4_gen.generate(
-                    lig_mol, rec_mol, ia_ph4, extract_core_env = True
+                    lig_mol, rec_mol, ia_ph4, extract_core_env=True
                 )  # generate the pharmacophore (True = extract ligand environment residues on-the-fly)
 
                 try:
@@ -179,14 +179,18 @@ def pdb_to_pml(receptor_file: str, ligand_file: str, output_pml: str) -> None:
                 #     "Error: interaction pharmacophore generation for molecule %s failed: %s"
                 #     % (mol_id, str(e))
                 # )
-                raise RuntimeError( "Error: interaction pharmacophore generation for molecule %s failed: %s"% (mol_id, str(e)))
+                raise RuntimeError(
+                    "Error: interaction pharmacophore generation for molecule %s failed: %s"
+                    % (mol_id, str(e))
+                )
 
             i += 1
 
     except (
         Exception
     ) as e:  # handle exception raised in case of severe read errors
-        raise RuntimeError("Error: reading molecule %s failed: %s" % (str(i), str(e)))
+        raise RuntimeError(
+            "Error: reading molecule %s failed: %s" % (str(i), str(e))
+        )
 
     ph4_writer.close()
- 

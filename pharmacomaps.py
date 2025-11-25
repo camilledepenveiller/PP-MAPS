@@ -25,7 +25,7 @@ def loop_core(
     pdb_path: str,
     path_to_pharmacogenerator: str,
     use_ligandscout: bool,
-    use_cdpkit: bool
+    use_cdpkit: bool,
 ) -> dict[str, dict]:
     ppdb = PandasPdb().read_pdb(pdb_path)
     ppdb_modified = modify_pdb(ppdb)
@@ -33,7 +33,6 @@ def loop_core(
 
     pml_name = "output_" + mp.current_process().name + ".pml"
     pml_path = os.path.join(PML_TMP_DIRECTORY, pml_name)
-
 
     if use_ligandscout:
         ligandscout.pdb_to_pml(pdb_path, path_to_pharmacogenerator, pml_path)
@@ -43,7 +42,7 @@ def loop_core(
         sdf_path = cdpkit.convert_pdb_to_sdf(ligand_path)
         cdpkit.pdb_to_pml(receptor_path, sdf_path, pml_path)
 
-    dict_interactions = xml_to_dict(pml_path)
+    dict_interactions = xml_to_dict(pml_path, use_cdpkit)
     return dict_interactions
 
 
