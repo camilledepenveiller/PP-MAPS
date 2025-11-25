@@ -35,9 +35,13 @@ def parse_xml(data_path: str) -> dict:
     return dict_data
 
 
-def xml_to_dict(data_path: str) -> dict[str, dict]:
+def xml_to_dict(data_path: str, use_cdpkit: bool) -> dict[str, dict]:
 
     dict_data = parse_xml(data_path)
+    if use_cdpkit:
+        dict_data = dict_data["ElementContainer"]["ContainerPharmacophores"][
+            "alignmentElement"
+        ]
     dict_res_p = count_interactions("point", dict_data)
     dict_res_v = count_interactions("vector", dict_data)
 
