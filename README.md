@@ -4,11 +4,23 @@
 Pharmacomaps tool allows to generate a heatmap of pharmacophore features of a protein-peptide complex from a molecular dynamics trajectory.
 
 
-Use `environment.yml` to create the environment:
+## Create environment
+
+Create and activate a new environment with the following commands:
 ```bash
-conda env create -f environment.yml
+conda env create -n pharmacomaps python=3.13
 conda activate pharmacomaps
 ```
+
+Use the `requirements.txt` file to install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+
+## Software dependency
+
+You need to have GROMACS installed on your system and `gmx` command accessible through the `PATH`.
 
 
 ## Choice of pharmacophore generator
@@ -41,20 +53,20 @@ options:
 
 ## Example
 
-In the `example`folder, you can find a short trajectory xtc file and a tpr file for tool testing.
+In the `example` folder, you can find a short trajectory xtc file and a tpr file for tool testing.
 
 Here is the command to run for pharmacomap generation from these files:
 
 - Using LigandScout
 
 ```bash
-python pharmacomaps.py -xtc md.xtc -tpr md.tpr -ligandscout -n 8
+python pharmacomaps.py -xtc example/md.xtc -tpr example/md.tpr -ligandscout -n 8
 ```
 
 - Using CDPKit
 
 ```bash
-python pharmacomaps.py -xtc md.xtc -tpr md.tpr -cdpkit -n 8
+python pharmacomaps.py -xtc example/md.xtc -tpr example/md.tpr -cdpkit -n 8
 ```
 
 

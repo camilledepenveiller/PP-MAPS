@@ -1,0 +1,10 @@
+black==25.9.0
+isort==6.1.0
+matplotlib==3.10.6
+numpy==2.3.4
+pandas==2.3.3
+rdkit==2025.03.6
+seaborn==0.13.2
+biopandas==0.5.1
+tqdm==4.67.1
+xmltodict==1.0.2
