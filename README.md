@@ -28,12 +28,12 @@ You need to have GROMACS installed on your system and `gmx` command accessible t
 Pharmacomaps tool is able to use either LigandScout (under license) or CDPKit (open source) in the worflow. You can choose your pharmacophore generator by specifying it when running Pharmacomaps tool. Before that, you have to install LigandScout or CDPKit.
 
 - For LigandScout, you have to adapt path to the pharmacophore generator: set the variable Pharmacophore_generator_path in `config.ini` file.
-- For CDPKit, you have to get at least version 1.3 and to be careful to install also Python bindings (see https://cdpkit.org/installation.html).
+- For CDPKit, you have to get at least version 1.3 and to be careful to install also Python bindings (see https://cdpkit.org/installation.html). If version 1.3 is not yet available, consider compiling CDPKit from source from the GitHub master branch.
 
 
 ## Usage
 
-:warning: Before providing your input files, be careful to prepare an xtc file with a centered trajectory.
+:warning: Before providing your input files, be careful to prepare an xtc file with a centered trajectory, with the condition that in the original PDB file of the complex, the ligand is at the end of the file.
 
 Run the following command to run pharmacophore analysis through MD trajectory and generate a pharmacomap:
 
