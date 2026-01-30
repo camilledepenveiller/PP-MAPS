@@ -6,7 +6,7 @@ PP-MAPS tool allows to generate a heatmap of pharmacophore features of a protein
 
 ## Create environment
 
-Create and activate a new environment with the following commands:
+After cloning the PP-MAPS repository, create and activate a new environment with the following commands:
 ```bash
 conda env create -n pp_maps python=3.13
 conda activate pp_maps

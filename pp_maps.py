@@ -9,6 +9,7 @@ from glob import glob
 from biopandas.pdb import PandasPdb
 
 from pp_maps_scripts import cdpkit, ligandscout
+from pp_maps_scripts.exceptions import PMLError
 from pp_maps_scripts.gmx import traj_to_pdbs
 from pp_maps_scripts.map_interactions import generate_heatmap
 from pp_maps_scripts.pdb_modif import modify_pdb
@@ -42,6 +43,11 @@ def loop_core(
         sdf_path = cdpkit.convert_pdb_to_sdf(ligand_path)
         cdpkit.pdb_to_pml(receptor_path, sdf_path, pml_path)
 
+    if not os.path.isfile(pml_path):
+        raise PMLError(
+            message=f"PML path ({pml_path}) not found. "
+            "Check your pharmacophore generator installation/license."
+        )
     dict_interactions = xml_to_dict(pml_path, use_cdpkit)
     return dict_interactions
 
