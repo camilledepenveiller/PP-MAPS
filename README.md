@@ -1,15 +1,15 @@
-# Pharmacomaps
+# PP-MAPS: Protein-Peptide Molecular dynamics Assisted Pharmacophore Signatures
 
 
-Pharmacomaps tool allows to generate a heatmap of pharmacophore features of a protein-peptide complex from a molecular dynamics trajectory.
+PP-MAPS tool allows to generate a heatmap of pharmacophore features of a protein-peptide complex from a molecular dynamics trajectory.
 
 
 ## Create environment
 
 Create and activate a new environment with the following commands:
 ```bash
-conda env create -n pharmacomaps python=3.13
-conda activate pharmacomaps
+conda env create -n pp_maps python=3.13
+conda activate pp_maps
 ```
 
 Use the `requirements.txt` file to install dependencies:
@@ -25,7 +25,7 @@ You need to have GROMACS installed on your system and `gmx` command accessible t
 
 ## Choice of pharmacophore generator
 
-Pharmacomaps tool is able to use either LigandScout (under license) or CDPKit (open source) in the worflow. You can choose your pharmacophore generator by specifying it when running Pharmacomaps tool. Before that, you have to install LigandScout or CDPKit.
+PP-MAPS tool is able to use either LigandScout (under license) or CDPKit (open source) in the worflow. You can choose your pharmacophore generator by specifying it when running PP-MAPS tool. Before that, you have to install LigandScout or CDPKit.
 
 - For LigandScout, you have to adapt path to the pharmacophore generator: set the variable Pharmacophore_generator_path in `config.ini` file.
 - For CDPKit, you have to get at least version 1.3 and to be careful to install also Python bindings (see https://cdpkit.org/installation.html). If version 1.3 is not yet available, consider compiling CDPKit from source from the GitHub master branch.
@@ -33,12 +33,12 @@ Pharmacomaps tool is able to use either LigandScout (under license) or CDPKit (o
 
 ## Usage
 
-:warning: Before providing your input files, be careful to prepare an xtc file with a centered trajectory, with the condition that in the original PDB file of the complex, the ligand is at the end of the file.
+:warning: Before providing your input files, be careful to prepare an XTC file with a centered trajectory, provided that in the original PDB file of the complex, the peptide is at the end of the file.
 
 Run the following command to run pharmacophore analysis through MD trajectory and generate a pharmacomap:
 
 ```bash
-python pharmacomaps.py [-h] -xtc XTC -tpr TPR [-n N] [-o OUTPUT]
+python pp_maps.py [-h] -xtc XTC -tpr TPR [-n N] [-o OUTPUT]
 
 options:
   -h, --help                        show this help message and exit
@@ -53,26 +53,26 @@ options:
 
 ## Example
 
-In the `example` folder, you can find a short trajectory xtc file and a tpr file for tool testing.
+In the `example` folder, you can find a short trajectory XTC file and a TPR file for tool testing.
 
 Here is the command to run for pharmacomap generation from these files:
 
 - Using LigandScout
 
 ```bash
-python pharmacomaps.py -xtc example/md.xtc -tpr example/md.tpr -ligandscout -n 8
+python pp_maps.py -xtc example/md.xtc -tpr example/md.tpr -ligandscout -n 8
 ```
 
 - Using CDPKit
 
 ```bash
-python pharmacomaps.py -xtc example/md.xtc -tpr example/md.tpr -cdpkit -n 8
+python pp_maps.py -xtc example/md.xtc -tpr example/md.tpr -cdpkit -n 8
 ```
 
 
 ## References
 
-Pharmacomaps tool is based on `ipharmgen` tool from LigandScout and on `gen_ia_ph4s.py` script (modified) from CDPKit.
+PP-MAPS tool is based on `ipharmgen` tool from LigandScout and on `gen_ia_ph4s.py` script (modified) from CDPKit.
 
 - LigandScout
 

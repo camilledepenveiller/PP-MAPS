@@ -8,15 +8,15 @@ from glob import glob
 
 from biopandas.pdb import PandasPdb
 
-from pharmacomaps_scripts import cdpkit, ligandscout
-from pharmacomaps_scripts.gmx import traj_to_pdbs
-from pharmacomaps_scripts.map_interactions import generate_heatmap
-from pharmacomaps_scripts.pdb_modif import modify_pdb
-from pharmacomaps_scripts.pharmaco_analyses import (
+from pp_maps_scripts import cdpkit, ligandscout
+from pp_maps_scripts.gmx import traj_to_pdbs
+from pp_maps_scripts.map_interactions import generate_heatmap
+from pp_maps_scripts.pdb_modif import modify_pdb
+from pp_maps_scripts.pharmaco_analyses import (
     get_global_dict,
     get_interactions_percentage,
 )
-from pharmacomaps_scripts.pml import xml_to_dict
+from pp_maps_scripts.pml import xml_to_dict
 
 PML_TMP_DIRECTORY = "tmp"
 
