@@ -8,7 +8,7 @@ PP-MAPS tool allows to generate a heatmap of pharmacophore features of a protein
 
 After cloning the PP-MAPS repository, create and activate a new environment with the following commands:
 ```bash
-conda env create -n pp_maps python=3.13
+conda create -n pp_maps python=3.13
 conda activate pp_maps
 ```
 
@@ -49,6 +49,8 @@ options:
   -n N                              number of processes to perform the analysis, default to 1
   -o OUTPUT, --output OUTPUT        PNG output file with heatmap of pharmacophore features of the whole MD, default to pharmacomap.png
 ```
+
+Note that when using PP-MAPS with LigandScout, it will automatically produce two additional pharmacomaps, based on the same statistics, but allowing to differentiate between backbone (`pharmacomap_BB.png`) and side-chain (`pharmacomap_SC.png`) interactions with the protein amino acids.
 
 
 ## Example

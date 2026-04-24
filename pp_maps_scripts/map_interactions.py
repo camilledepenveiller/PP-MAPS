@@ -28,12 +28,20 @@ def generate_heatmap(json_file: str, output_file: str) -> None:
     )
     data = json.load(f)
     list_interactions = []
+    dict_new_labels = {
+        "H": "H",
+        "HBD": "D",
+        "HBA": "A",
+        "PI": "+",
+        "NI": "-",
+        "AR": "π",
+    }
 
     # Put json file data into a list of interactions list
     for interaction in data.keys():
         list_interactions.append(
             [
-                interaction.split("_", 1)[0],
+                dict_new_labels[interaction.split("_", 1)[0]],
                 interaction.split("_", 1)[1],
                 data[interaction],
             ]

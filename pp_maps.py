@@ -1,10 +1,12 @@
 import argparse
 import configparser
+import csv
 import json
 import multiprocessing as mp
 import os
 import sys
 from glob import glob
+from typing import Optional
 
 from biopandas.pdb import PandasPdb
 
@@ -27,7 +29,7 @@ def loop_core(
     path_to_pharmacogenerator: str,
     use_ligandscout: bool,
     use_cdpkit: bool,
-) -> dict[str, dict]:
+) -> tuple[dict, Optional[dict], Optional[dict]]:
     ppdb = PandasPdb().read_pdb(pdb_path)
     ppdb_modified = modify_pdb(ppdb)
     ppdb_modified.to_pdb(pdb_path)
@@ -48,8 +50,10 @@ def loop_core(
             message=f"PML path ({pml_path}) not found. "
             "Check your pharmacophore generator installation/license."
         )
-    dict_interactions = xml_to_dict(pml_path, use_cdpkit)
-    return dict_interactions
+    dict_interactions, dict_bb, dict_sc = xml_to_dict(
+        pml_path, use_cdpkit, use_ligandscout
+    )
+    return dict_interactions, dict_bb, dict_sc
 
 
 def from_traj_to_pharmaco(
@@ -60,7 +64,7 @@ def from_traj_to_pharmaco(
     use_ligandscout: bool,
     use_cdpkit: bool,
     number_processes: int,
-) -> list[dict]:
+) -> tuple[list]:
 
     traj_to_pdbs(path_traj, path_tpr, output_dir_pdbs)
 
@@ -78,9 +82,17 @@ def from_traj_to_pharmaco(
         os.makedirs(PML_TMP_DIRECTORY)
 
     pool = mp.Pool(number_processes)
-    list_dict = pool.starmap(loop_core, list_args)
+    list_tuple_dict = pool.starmap(loop_core, list_args)
 
-    return list_dict
+    list_dict = []
+    list_bb = []
+    list_sc = []
+    for tuple_dict in list_tuple_dict:
+        list_dict.append(tuple_dict[0])
+        list_bb.append(tuple_dict[1])
+        list_sc.append(tuple_dict[2])
+
+    return list_dict, list_bb, list_sc
 
 
 if __name__ == "__main__":
@@ -143,7 +155,7 @@ if __name__ == "__main__":
         sys.exit()
     output_dir_pdbs = "extracted_pdbs"
     print("Starting PML files creation")
-    list_dict_interactions = from_traj_to_pharmaco(
+    list_dict_interactions, list_bb, list_sc = from_traj_to_pharmaco(
         path_traj,
         path_tpr,
         output_dir_pdbs,
@@ -156,11 +168,55 @@ if __name__ == "__main__":
     global_dict_interactions_percentage = get_interactions_percentage(
         global_dict_interactions, len(list_dict_interactions)
     )
+    if use_ligandscout:
+        global_dict_bb = get_global_dict(list_bb)
+        global_dict_bb_percentage = get_interactions_percentage(
+            global_dict_bb, len(list_bb)
+        )
+        global_dict_sc = get_global_dict(list_sc)
+        global_dict_sc_percentage = get_interactions_percentage(
+            global_dict_sc, len(list_sc)
+        )
+
+    # Generate csv file with interactions and percentages from dict
+    with open("pharmacophores.csv", "w") as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in global_dict_interactions_percentage.items():
+            writer.writerow([key, value])
+
+    if use_ligandscout:
+        with open("pharmacophores_bb.csv", "w") as csv_file_bb:
+            writer = csv.writer(csv_file_bb)
+            for key, value in global_dict_bb_percentage.items():
+                writer.writerow([key, value])
+        with open("pharmacophores_sc.csv", "w") as csv_file_sc:
+            writer = csv.writer(csv_file_sc)
+            for key, value in global_dict_sc_percentage.items():
+                writer.writerow([key, value])
+
+    # Generate json file with interactions and percentages from dict
     output_json = "pharmacophores.json"
     with open(output_json, "w") as file_interactions:
         json.dump(
             global_dict_interactions_percentage, file_interactions, indent=4
         )
+
+    if use_ligandscout:
+        output_json_bb = "pharmacophores_bb.json"
+        with open(output_json_bb, "w") as file_interactions_bb:
+            json.dump(
+                global_dict_bb_percentage, file_interactions_bb, indent=4
+            )
+        output_json_sc = "pharmacophores_sc.json"
+        with open(output_json_sc, "w") as file_interactions_sc:
+            json.dump(
+                global_dict_sc_percentage, file_interactions_sc, indent=4
+            )
+
+    # Heatmap generation from json file
     print("Starting heatmap generation")
     generate_heatmap(output_json, args.output)
+    if use_ligandscout:
+        generate_heatmap(output_json_bb, "pharmacomap_BB.png")
+        generate_heatmap(output_json_sc, "pharmacomap_SC.png")
     print("Pharmacomap successfully generated")
