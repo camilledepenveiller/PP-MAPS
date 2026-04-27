@@ -14,6 +14,7 @@ from pp_maps_scripts import cdpkit, ligandscout
 from pp_maps_scripts.exceptions import PMLError
 from pp_maps_scripts.gmx import traj_to_pdbs
 from pp_maps_scripts.map_interactions import generate_heatmap
+from pp_maps_scripts.mdtraj import mdtraj_to_pdbs
 from pp_maps_scripts.pdb_modif import modify_pdb
 from pp_maps_scripts.pharmaco_analyses import (
     get_global_dict,
@@ -58,15 +59,21 @@ def loop_core(
 
 def from_traj_to_pharmaco(
     path_traj: str,
-    path_tpr: str,
+    path_topol: str,
     output_dir_pdbs: str,
     path_to_pharmacogenerator: str,
     use_ligandscout: bool,
     use_cdpkit: bool,
+    use_gromacs: bool,
+    use_mdtraj: bool,
     number_processes: int,
 ) -> tuple[list]:
 
-    traj_to_pdbs(path_traj, path_tpr, output_dir_pdbs)
+    if use_gromacs:
+        traj_to_pdbs(path_traj, path_topol, output_dir_pdbs)
+
+    if use_mdtraj:
+        mdtraj_to_pdbs(path_traj, path_topol, output_dir_pdbs)
 
     list_pdbs = glob(output_dir_pdbs + "/*")
     list_args = [
@@ -105,7 +112,10 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
-        "-tpr", type=str, help="TPR file used for MD.", required=True
+        "-topol",
+        type=str,
+        help="Topology file (TPR for GROMACS or PDB as required for MDTraj).",
+        required=True,
     )
     parser.add_argument(
         "-ligandscout",
@@ -116,6 +126,16 @@ if __name__ == "__main__":
         "-cdpkit",
         action="store_true",
         help="Add this argument to use CDPKit as pharmacophore generator.",
+    )
+    parser.add_argument(
+        "-gromacs",
+        action="store_true",
+        help="Add this argument to use GROMACS to convert XTC to PDBs.",
+    )
+    parser.add_argument(
+        "-mdtraj",
+        action="store_true",
+        help="Add this argument to use MDTraj (mdconvert) to convert XTC to PDBs.",
     )
     parser.add_argument(
         "-n",
@@ -139,9 +159,11 @@ if __name__ == "__main__":
     ]
 
     path_traj = args.xtc
-    path_tpr = args.tpr
+    path_topol = args.topol
     use_ligandscout = args.ligandscout
     use_cdpkit = args.cdpkit
+    use_gromacs = args.gromacs
+    use_mdtraj = args.mdtraj
     number_processes = args.n
     if use_ligandscout and use_cdpkit:
         print(
@@ -153,15 +175,33 @@ if __name__ == "__main__":
             "No argument specified for pharmacophore generator. Please select one tool."
         )
         sys.exit()
+    if use_gromacs and use_mdtraj:
+        print(
+            "Too many arguments for trajectory converter. Please select only one tool."
+        )
+        sys.exit()
+    if not use_gromacs and not use_mdtraj:
+        print(
+            "No argument specified for trajectory converter. Please select one tool."
+        )
+        sys.exit()
+    if use_gromacs and os.path.splitext(path_topol)[1] != ".tpr":
+        print("Using GROMACS requires a TPR file as topology. Please provide a .tpr file for argument -topol.")
+        sys.exit()
+    if use_mdtraj and os.path.splitext(path_topol)[1] != ".pdb":
+        print("Using MDTraj requires a PDB file as topology. Please provide a .pdb file for argument -topol.")
+        sys.exit()
     output_dir_pdbs = "extracted_pdbs"
     print("Starting PML files creation")
     list_dict_interactions, list_bb, list_sc = from_traj_to_pharmaco(
         path_traj,
-        path_tpr,
+        path_topol,
         output_dir_pdbs,
         path_to_pharmacogenerator,
         use_ligandscout,
         use_cdpkit,
+        use_gromacs,
+        use_mdtraj,
         number_processes,
     )
     global_dict_interactions = get_global_dict(list_dict_interactions)

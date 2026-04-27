@@ -20,12 +20,17 @@ pip install -r requirements.txt
 
 ## Software dependency
 
-You need to have GROMACS installed on your system and `gmx` command accessible through the `PATH`.
+For trajectory conversion from XTC to PDBs, you have two possibilities.
+Either you need to have GROMACS installed on your system and `gmx` command accessible through the `PATH`.
+Otherwise, you have to install MDTraj in your environment through this command:
+```bash
+pip install mdtraj
+```
 
 
 ## Choice of pharmacophore generator
 
-PP-MAPS tool is able to use either LigandScout (under license) or CDPKit (open source) in the worflow. You can choose your pharmacophore generator by specifying it when running PP-MAPS tool. Before that, you have to install LigandScout or CDPKit.
+PP-MAPS tool is able to use either LigandScout (under license) or CDPKit (open source) in the workflow. You can choose your pharmacophore generator by specifying it when running PP-MAPS tool. Before that, you have to install LigandScout or CDPKit.
 
 - For LigandScout, you have to adapt path to the pharmacophore generator: set the variable Pharmacophore_generator_path in `config.ini` file.
 - For CDPKit, you have to get at least version 1.3 and to be careful to install also Python bindings (see https://cdpkit.org/installation.html). If version 1.3 is not yet available, consider compiling CDPKit from source from the GitHub master branch.
@@ -38,16 +43,18 @@ PP-MAPS tool is able to use either LigandScout (under license) or CDPKit (open s
 Run the following command to run pharmacophore analysis through MD trajectory and generate a pharmacomap:
 
 ```bash
-python pp_maps.py [-h] -xtc XTC -tpr TPR [-n N] [-o OUTPUT]
+pp_maps.py [-h] -xtc XTC -topol TOPOL [-ligandscout] [-cdpkit] [-gromacs] [-mdtraj] [-n N] [-o OUTPUT]
 
 options:
-  -h, --help                        show this help message and exit
-  -xtc XTC                          XTC trajectory file with centered system
-  -tpr TPR                          TPR file used for MD
-  -ligandscout                      add this argument to use LigandScout as pharmacophore generator
-  -cdpkit                           add this argument to use CDPKit as pharmacophore generator
-  -n N                              number of processes to perform the analysis, default to 1
-  -o OUTPUT, --output OUTPUT        PNG output file with heatmap of pharmacophore features of the whole MD, default to pharmacomap.png
+  -h, --help           show this help message and exit
+  -xtc XTC             XTC trajectory file with centered system.
+  -topol TOPOL         Topology file (TPR for GROMACS or PDB as required for MDTraj).
+  -ligandscout         Add this argument to use LigandScout as pharmacophore generator.
+  -cdpkit              Add this argument to use CDPKit as pharmacophore generator.
+  -gromacs             Add this argument to use GROMACS to convert XTC to PDBs.
+  -mdtraj              Add this argument to use MDTraj (mdconvert) to convert XTC to PDBs.
+  -n N                 Number of processes to perform the analysis. Default to 1.
+  -o, --output OUTPUT  PNG output file with heatmap of pharmacophore features of the whole MD. Default to pharmacomap.png
 ```
 
 Note that when using PP-MAPS with LigandScout, it will automatically produce two additional pharmacomaps, based on the same statistics, but allowing to differentiate between backbone (`pharmacomap_BB.png`) and side-chain (`pharmacomap_SC.png`) interactions with the protein amino acids.
@@ -62,13 +69,13 @@ Here is the command to run for pharmacomap generation from these files:
 - Using LigandScout
 
 ```bash
-python pp_maps.py -xtc example/md.xtc -tpr example/md.tpr -ligandscout -n 8
+python pp_maps.py -xtc example/md.xtc -topol example/md.tpr -ligandscout -gromacs -n 8
 ```
 
 - Using CDPKit
 
 ```bash
-python pp_maps.py -xtc example/md.xtc -tpr example/md.tpr -cdpkit -n 8
+python pp_maps.py -xtc example/md.xtc -topol example/md.tpr -cdpkit -gromacs -n 8
 ```
 
 
