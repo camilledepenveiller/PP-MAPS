@@ -59,6 +59,7 @@ def loop_core(
 
 def from_traj_to_pharmaco(
     path_traj: str,
+    path_pdbs: str,
     path_topol: str,
     output_dir_pdbs: str,
     path_to_pharmacogenerator: str,
@@ -69,13 +70,18 @@ def from_traj_to_pharmaco(
     number_processes: int,
 ) -> tuple[list]:
 
-    if use_gromacs:
-        traj_to_pdbs(path_traj, path_topol, output_dir_pdbs)
+    if path_traj is not None:
+        if use_gromacs:
+            traj_to_pdbs(path_traj, path_topol, output_dir_pdbs)
 
-    if use_mdtraj:
-        mdtraj_to_pdbs(path_traj, path_topol, output_dir_pdbs)
+        if use_mdtraj:
+            mdtraj_to_pdbs(path_traj, path_topol, output_dir_pdbs)
 
-    list_pdbs = glob(output_dir_pdbs + "/*")
+        list_pdbs = glob(os.path.join(output_dir_pdbs, "*"))
+    
+    if path_pdbs is not None:
+        list_pdbs = glob(os.path.join(path_pdbs, "*"))
+    
     list_args = [
         (pdb, path_to_pharmacogenerator, use_ligandscout, use_cdpkit)
         for pdb in list_pdbs
@@ -108,8 +114,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "-xtc",
         type=str,
-        help="XTC trajectory file with centered system.",
-        required=True,
+        help="Path to XTC trajectory file with centered system.",
+    )
+    parser.add_argument(
+        "-pdb",
+        type=str,
+        help="Path to PDB files directory.",
     )
     parser.add_argument(
         "-topol",
@@ -141,7 +151,7 @@ if __name__ == "__main__":
         "-n",
         type=int,
         default=1,
-        help="Number of processes to perform the analysis. Default to 1.",
+        help="Number of processors/CPUs to perform the analysis. Default to 1.",
     )
     parser.add_argument(
         "-o",
@@ -159,12 +169,19 @@ if __name__ == "__main__":
     ]
 
     path_traj = args.xtc
+    path_pdbs = args.pdb
     path_topol = args.topol
     use_ligandscout = args.ligandscout
     use_cdpkit = args.cdpkit
     use_gromacs = args.gromacs
     use_mdtraj = args.mdtraj
     number_processes = args.n
+    if path_traj is not None and path_pdbs is not None:
+        print("Too many arguments for input data. Please provide only -xtc or -pdb argument.")
+        sys.exit()
+    if path_traj is None and path_pdbs is None:
+        print("No argument specified for input data. Please provide -xtc or -pdb argument.")
+        sys.exit()
     if use_ligandscout and use_cdpkit:
         print(
             "Too many arguments for pharmacophore generator. Please select only one tool."
@@ -195,6 +212,7 @@ if __name__ == "__main__":
     print("Starting PML files creation")
     list_dict_interactions, list_bb, list_sc = from_traj_to_pharmaco(
         path_traj,
+        path_pdbs,
         path_topol,
         output_dir_pdbs,
         path_to_pharmacogenerator,

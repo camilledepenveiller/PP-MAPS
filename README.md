@@ -38,22 +38,25 @@ PP-MAPS tool is able to use either LigandScout (under license) or CDPKit (open s
 
 ## Usage
 
+You can choose to provide as input either an XTC trajectory, or directly a directory of PDB files.
+
 :warning: Before providing your input files, be careful to prepare an XTC file with a centered trajectory, provided that in the original PDB file of the complex, the peptide is at the end of the file.
 
 Run the following command to run pharmacophore analysis through MD trajectory and generate a pharmacomap:
 
 ```bash
-pp_maps.py [-h] -xtc XTC -topol TOPOL [-ligandscout] [-cdpkit] [-gromacs] [-mdtraj] [-n N] [-o OUTPUT]
+pp_maps.py [-h] [-xtc XTC] [-pdb PDB] -topol TOPOL [-ligandscout] [-cdpkit] [-gromacs] [-mdtraj] [-n N] [-o OUTPUT]
 
 options:
   -h, --help           show this help message and exit
-  -xtc XTC             XTC trajectory file with centered system.
+  -xtc XTC             Path to XTC trajectory file with centered system.
+  -pdb PDB             Path to PDB files directory.
   -topol TOPOL         Topology file (TPR for GROMACS or PDB as required for MDTraj).
   -ligandscout         Add this argument to use LigandScout as pharmacophore generator.
   -cdpkit              Add this argument to use CDPKit as pharmacophore generator.
   -gromacs             Add this argument to use GROMACS to convert XTC to PDBs.
   -mdtraj              Add this argument to use MDTraj (mdconvert) to convert XTC to PDBs.
-  -n N                 Number of processes to perform the analysis. Default to 1.
+  -n N                 Number of processors/CPUs to perform the analysis. Default to 1.
   -o, --output OUTPUT  PNG output file with heatmap of pharmacophore features of the whole MD. Default to pharmacomap.png
 ```
 
@@ -85,15 +88,25 @@ PP-MAPS tool is based on `ipharmgen` tool from LigandScout and on `gen_ia_ph4s.p
 
 - LigandScout
 
-*Installation process:* https://docs.inteligand.com/ligandscout/
+*Installation process:* https://docs.inteligand.com/ligandscout/.
 
 *Article:* G. Wolber and T. Langer, ‘LigandScout: 3-D Pharmacophores Derived from Protein-Bound Ligands and Their Use as Virtual Screening Filters’, J. Chem. Inf. Model., vol. 45, no. 1, pp. 160–169, Jan. 2005, doi: 10.1021/ci049885e.
 
 - CDPKit
 
-*Source code:* Thomas Seidel, Chemical Data Processing Toolkit source code repository, https://github.com/molinfo-vienna/CDPKit
+*Source code:* Thomas Seidel, Chemical Data Processing Toolkit source code repository, https://github.com/molinfo-vienna/CDPKit.
 
-*Documentation:* Thomas Seidel, Oliver Wieder, Chemical Data Processing Toolkit documentation pages, https://cdpkit.org
+*Documentation:* Thomas Seidel, Oliver Wieder, Chemical Data Processing Toolkit documentation pages, https://cdpkit.org.
+
+- GROMACS
+
+*Installation process:* https://manual.gromacs.org/current/install-guide/index.html.
+
+*Article:* Berendsen, H. J. C.; van der Spoel, D.; van Drunen, R. GROMACS: A Message-Passing Parallel Molecular Dynamics Implementation. Computer Physics Communications 1995, 91 (1–3), 43–56. https://doi.org/10.1016/0010-4655(95)00042-E.
+
+- MDTraj
+
+*Article:* McGibbon, R. T.; Beauchamp, K. A.; Harrigan, M. P.; Klein, C.; Swails, J. M.; Hernández, C. X.; Schwantes, C. R.; Wang, L.-P.; Lane, T. J.; Pande, V. S. MDTraj: A Modern Open Library for the Analysis of Molecular Dynamics Trajectories. Biophysical Journal 2015, 109 (8), 1528–1532. https://doi.org/10.1016/j.bpj.2015.08.015.
 
 
 ## Formatting
