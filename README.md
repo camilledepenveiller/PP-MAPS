@@ -22,9 +22,9 @@ pip install -r requirements.txt
 
 For trajectory conversion from XTC to PDBs, you have two possibilities.
 Either you need to have GROMACS installed on your system and `gmx` command accessible through the `PATH`.
-Otherwise, you have to install MDTraj in your environment through this command:
+Otherwise, you have to install MDTraj (1.11.1) in your environment through this command:
 ```bash
-pip install mdtraj
+pip install mdtraj==1.11.1
 ```
 
 
@@ -33,7 +33,9 @@ pip install mdtraj
 PP-MAPS tool is able to use either LigandScout (under license) or CDPKit (open source) in the workflow. You can choose your pharmacophore generator by specifying it when running PP-MAPS tool. Before that, you have to install LigandScout or CDPKit.
 
 - For LigandScout, you have to adapt path to the pharmacophore generator: set the variable Pharmacophore_generator_path in `config.ini` file.
-- For CDPKit, you have to get at least version 1.3 and to be careful to install also Python bindings (see https://cdpkit.org/installation.html). If version 1.3 is not yet available, consider compiling CDPKit from source from the GitHub master branch.
+- For CDPKit:
+  * first install CDPKit (1.3.0) with your package manager (see https://cdpkit.org/installation.html);
+  * then install Python bindings with `pip install cdpkit==1.3.0`.
 
 
 ## Usage
