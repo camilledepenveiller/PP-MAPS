@@ -10,7 +10,6 @@ from typing import Optional
 
 from biopandas.pdb import PandasPdb
 
-from pp_maps_scripts import cdpkit, ligandscout
 from pp_maps_scripts.exceptions import PMLError
 from pp_maps_scripts.gmx import traj_to_pdbs
 from pp_maps_scripts.map_interactions import generate_heatmap
@@ -31,6 +30,7 @@ def loop_core(
     use_ligandscout: bool,
     use_cdpkit: bool,
 ) -> tuple[dict, Optional[dict], Optional[dict]]:
+    
     ppdb = PandasPdb().read_pdb(pdb_path)
     ppdb_modified = modify_pdb(ppdb)
     ppdb_modified.to_pdb(pdb_path)
@@ -124,8 +124,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-topol",
         type=str,
-        help="Topology file (TPR for GROMACS or PDB as required for MDTraj).",
-        required=True,
+        help="Topology file (TPR with GROMACS or PDB with MDTraj). Required when providing an XTC as input.",
     )
     parser.add_argument(
         "-ligandscout",
@@ -182,6 +181,9 @@ if __name__ == "__main__":
     if path_traj is None and path_pdbs is None:
         print("No argument specified for input data. Please provide -xtc or -pdb argument.")
         sys.exit()
+    if path_traj is not None and path_topol is None:
+        print("Providing XTC as input requires a topology file. Please provide a file for argument -topol.")
+        sys.exit()
     if use_ligandscout and use_cdpkit:
         print(
             "Too many arguments for pharmacophore generator. Please select only one tool."
@@ -197,17 +199,21 @@ if __name__ == "__main__":
             "Too many arguments for trajectory converter. Please select only one tool."
         )
         sys.exit()
-    if not use_gromacs and not use_mdtraj:
+    if path_traj and (not use_gromacs and not use_mdtraj):
         print(
             "No argument specified for trajectory converter. Please select one tool."
         )
         sys.exit()
     if use_gromacs and os.path.splitext(path_topol)[1] != ".tpr":
-        print("Using GROMACS requires a TPR file as topology. Please provide a .tpr file for argument -topol.")
+        print("Using GROMACS requires a TPR file as topology. Please provide a TPR file for argument -topol.")
         sys.exit()
     if use_mdtraj and os.path.splitext(path_topol)[1] != ".pdb":
-        print("Using MDTraj requires a PDB file as topology. Please provide a .pdb file for argument -topol.")
+        print("Using MDTraj requires a PDB file as topology. Please provide a PDB file for argument -topol.")
         sys.exit()
+    if use_ligandscout:
+        from pp_maps_scripts import ligandscout
+    if use_cdpkit:
+        from pp_maps_scripts import cdpkit
     output_dir_pdbs = "extracted_pdbs"
     print("Starting PML files creation")
     list_dict_interactions, list_bb, list_sc = from_traj_to_pharmaco(

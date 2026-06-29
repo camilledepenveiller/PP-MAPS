@@ -53,7 +53,7 @@ options:
   -h, --help           show this help message and exit
   -xtc XTC             Path to XTC trajectory file with centered system.
   -pdb PDB             Path to PDB files directory.
-  -topol TOPOL         Topology file (TPR for GROMACS or PDB as required for MDTraj).
+  -topol TOPOL         Topology file (TPR with GROMACS or PDB with MDTraj). Required when providing an XTC as input.
   -ligandscout         Add this argument to use LigandScout as pharmacophore generator.
   -cdpkit              Add this argument to use CDPKit as pharmacophore generator.
   -gromacs             Add this argument to use GROMACS to convert XTC to PDBs.
